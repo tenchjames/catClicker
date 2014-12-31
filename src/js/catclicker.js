@@ -1,98 +1,115 @@
 (function() {
-    var catPicture = document.getElementById('catPicture'),
-        catList = document.getElementById('catList'),
-        catImages = [],
-        i;
-    
-    var incrementClickCount = function(catName) {
-        return function() {
-            var catElement = document.getElementById(catName + 'Count');
-            var cat = findCatIndexByName(catName);
-            catImages[cat].totalClicks += 1;
-            catElement.innerHTML = catImages[cat].totalClicks.toString();        
-        };
-    };
-    
-    var cat = {name: "cat", src: "img/cat.jpg"},
-        kitten = {name: "kitty", src: "img/kitty.jpg"},
-        jinxy = {name: "jinxy", src: "img/jinxy.jpg"},
-        cutie = {name: "cutie", src: "img/cutie.jpg"};
-
-    var addCatImage = function(cat) {
-        cat.totalClicks = 0;
-        cat.domImage = document.createElement('img');
-        cat.domImage.src = cat.src;
-        cat.domImage.id = cat.name;
-        cat.domImage.addEventListener('click',
-            incrementClickCount(cat.name), false);
-        catImages.push(cat);
-    };
-
-    var findCatIndexByName = function(catName) {
-        for (i = 0; i < nCatImages; i += 1) {
-            if (catImages[i].name === catName) {
-                return i;
+    var model = {
+        currentCat: null,
+        cats: [
+            {name: "zed", src: "img/cat.jpg", clicks: 0},
+            {name: "furry", src: "img/kitty.jpg", clicks: 0},
+            {name: "jinxy", src: "img/jinxy.jpg", clicks: 0},
+            {name: "cutie", src: "img/cutie.jpg", clicks: 0}
+        ],
+        init: function() {
+            if (!localStorage.cats) {
+                localStorage.cats = JSON.stringify(this.cats);
             }
+        },
+
+        add: function(obj) {
+            var data = JSON.parse(localStorage.cats);
+            this.cats.push(obj);
+            localStorage.cats = JSON.stringify(this.cats);
+        },
+
+        getAllCats: function() {
+            return this.cats;
         }
-        return -1;
     };
 
-    var swapCatImage = function(newCat) {
-        return function() {
-            while (catPicture.firstChild) {
-                catPicture.removeChild(catPicture.firstChild);
+    var octopus = {
+        init: function() {
+            model.init();
+            model.currentCat = model.cats[0];
+
+            viewCatList.init();
+            viewCatPicture.init();
+        },
+
+        getCats: function() {
+            return model.getAllCats();
+        },
+
+        getCurrentCat: function() {
+            return model.currentCat;
+        },
+
+        swapCat: function(cat) {
+            model.currentCat = cat;
+        },
+
+        incrementClickCount: function() {
+            model.currentCat.clicks += 1;
+            viewCatPicture.render();
+        }
+    };
+
+
+
+    var viewCatPicture = {
+        init: function() {
+            this.catNameElement = document.getElementById('cat-name');
+            this.catPictureElement = document.getElementById('catPicture');
+            this.catCountElement = document.getElementById('cat-count');
+            this.catImageElement = document.getElementById('cat-img');
+
+            this.catImageElement.addEventListener('click', function(e) {
+                octopus.incrementClickCount();
+            });
+
+            this.render();
+        },
+
+        render: function() {
+            var currentCat = octopus.getCurrentCat();
+            this.catNameElement.textContent = currentCat.name;
+            this.catCountElement.textContent = currentCat.clicks;
+            this.catImageElement.src = currentCat.src;
+        }
+    };
+
+    var viewCatList = {
+        init: function() {
+            this.catList = document.getElementById('kittenList');
+            this.render();
+        },
+
+        render: function () {
+            var catListFragment = document.createDocumentFragment(),
+                catLiElement,
+                cats = octopus.getCats(),
+                nCats = cats.length;
+
+            for (i = 0; i < nCats; i += 1) {
+                catLiElement = document.createElement('li');
+                catLiElement.className = 'kittenListItem';
+                catLiElement.id = cats[i].name + 'ListItem';
+                catLiElement.innerHTML = cats[i].name;
+                catLiElement.addEventListener('click', 
+                    this.attachEventListenter(cats[i]), false);
+                catListFragment.appendChild(catLiElement);
             }
-            catPicture.appendChild(createCatImage(newCat));            
-        };
-    };
-
-    addCatImage(cat);
-    addCatImage(kitten);
-    addCatImage(jinxy);
-    addCatImage(cutie);
-
-    var catListFragment = document.createDocumentFragment(),
-        catUlElement,
-        catLiElement,
-        nCatImages = catImages.length;
-
-    if (nCatImages > 0) {
-        catUlElement = document.createElement('ul');
-        catUlElement.className = 'kittenList';
-
-        for (i = 0; i < nCatImages; i += 1) {
-            catLiElement = document.createElement('li');
-            catLiElement.className = 'kittenListItem';
-            catLiElement.id = catImages[i].name + 'ListItem';
-            catLiElement.innerHTML = catImages[i].name;
-            catLiElement.addEventListener('click', 
-                swapCatImage(catImages[i]), false);
-            catUlElement.appendChild(catLiElement);
+            while(this.catList.firstChild) {
+                this.catList.removeChild(this.catList.firstChild);
+            }
+            this.catList.appendChild(catListFragment);
+        },
+        attachEventListenter: function(cat) {
+            return function() {
+                octopus.swapCat(cat);
+                viewCatPicture.render();
+            };
         }
-        catListFragment.appendChild(catUlElement);
-        catList.appendChild(catListFragment);
-    }
-
-
-
-    var createCatImage = function(cat) {
-        var catPicturesFragement = document.createDocumentFragment(),
-            catNameElement,
-            catCountElement,
-            catName;       
-
-        catNameElement = document.createElement('p');
-        catNameElement.appendChild(document.createTextNode(cat.name + ' Click Count: '));
-        catCountElement = document.createElement('span');
-        catCountElement.id = cat.name + 'Count';
-        catCountElement.appendChild(document.createTextNode(cat.totalClicks));
-        catNameElement.appendChild(catCountElement);
-
-        catPicturesFragement.appendChild(catNameElement);
-        catPicturesFragement.appendChild(cat.domImage);
-        return catPicturesFragement;    
     };
 
-    catPicture.appendChild(createCatImage(catImages[0]));
+    octopus.init();
+
     
 })();
