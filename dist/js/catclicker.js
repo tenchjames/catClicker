@@ -1,54 +1,98 @@
 (function() {
-    var catPictures = document.getElementById('catPictures'),
-        catImages = [];
+    var catPicture = document.getElementById('catPicture'),
+        catList = document.getElementById('catList'),
+        catImages = [],
+        i;
     
     var incrementClickCount = function(catName) {
         return function() {
-            var catElement = document.getElementById(catName + 'Count'),
-            totalClicks;
-            totalClicks = parseInt(catElement.innerHTML, 10);
-            totalClicks += 1;
-            catElement.innerHTML = totalClicks.toString();             
+            var catElement = document.getElementById(catName + 'Count');
+            var cat = findCatIndexByName(catName);
+            catImages[cat].totalClicks += 1;
+            catElement.innerHTML = catImages[cat].totalClicks.toString();        
         };
     };
     
     var cat = {name: "cat", src: "img/cat.jpg"},
-        kitten = {name: "kitty", src: "img/kitty.jpg"};
+        kitten = {name: "kitty", src: "img/kitty.jpg"},
+        jinxy = {name: "jinxy", src: "img/jinxy.jpg"},
+        cutie = {name: "cutie", src: "img/cutie.jpg"};
 
-    catImages.push(cat);
-    catImages.push(kitten);
+    var addCatImage = function(cat) {
+        cat.totalClicks = 0;
+        cat.domImage = document.createElement('img');
+        cat.domImage.src = cat.src;
+        cat.domImage.id = cat.name;
+        cat.domImage.addEventListener('click',
+            incrementClickCount(cat.name), false);
+        catImages.push(cat);
+    };
 
-    var catPicturesFragement = document.createDocumentFragment(),
-        catImageElement,
-        catNameElement,
-        catCountElement,
-        catImage,
-        catName;
+    var findCatIndexByName = function(catName) {
+        for (i = 0; i < nCatImages; i += 1) {
+            if (catImages[i].name === catName) {
+                return i;
+            }
+        }
+        return -1;
+    };
 
-    for (var i = 0; i < catImages.length; i += 1) {
-        catImageElement = document.createElement('img');
-        catImageElement.src = catImages[i].src;
-        catImageElement.alt = catImages[i].name;
-        catImageElement.id = catImages[i].name + 'Img';
+    var swapCatImage = function(newCat) {
+        return function() {
+            while (catPicture.firstChild) {
+                catPicture.removeChild(catPicture.firstChild);
+            }
+            catPicture.appendChild(createCatImage(newCat));            
+        };
+    };
+
+    addCatImage(cat);
+    addCatImage(kitten);
+    addCatImage(jinxy);
+    addCatImage(cutie);
+
+    var catListFragment = document.createDocumentFragment(),
+        catUlElement,
+        catLiElement,
+        nCatImages = catImages.length;
+
+    if (nCatImages > 0) {
+        catUlElement = document.createElement('ul');
+        catUlElement.className = 'kittenList';
+
+        for (i = 0; i < nCatImages; i += 1) {
+            catLiElement = document.createElement('li');
+            catLiElement.className = 'kittenListItem';
+            catLiElement.id = catImages[i].name + 'ListItem';
+            catLiElement.innerHTML = catImages[i].name;
+            catLiElement.addEventListener('click', 
+                swapCatImage(catImages[i]), false);
+            catUlElement.appendChild(catLiElement);
+        }
+        catListFragment.appendChild(catUlElement);
+        catList.appendChild(catListFragment);
+    }
+
+
+
+    var createCatImage = function(cat) {
+        var catPicturesFragement = document.createDocumentFragment(),
+            catNameElement,
+            catCountElement,
+            catName;       
+
         catNameElement = document.createElement('p');
-        catNameElement.appendChild(document.createTextNode(catImages[i].name + ' Click Count: '));
+        catNameElement.appendChild(document.createTextNode(cat.name + ' Click Count: '));
         catCountElement = document.createElement('span');
-        catCountElement.id = catImages[i].name + 'Count';
-        catCountElement.appendChild(document.createTextNode('0'));
+        catCountElement.id = cat.name + 'Count';
+        catCountElement.appendChild(document.createTextNode(cat.totalClicks));
         catNameElement.appendChild(catCountElement);
 
         catPicturesFragement.appendChild(catNameElement);
-        catPicturesFragement.appendChild(catImageElement);
+        catPicturesFragement.appendChild(cat.domImage);
+        return catPicturesFragement;    
+    };
 
-    }
-    catPictures.appendChild(catPicturesFragement);
-
-    for (i = 0; i < catImages.length; i += 1) {
-        catImage = catImages[i];
-        catName = catImage.name;
-        catImageElement = document.getElementById(catName + 'Img');
-        catImageElement.addEventListener('click',
-                incrementClickCount(catName)); 
-    }
+    catPicture.appendChild(createCatImage(catImages[0]));
     
 })();
