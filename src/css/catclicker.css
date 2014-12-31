@@ -56,9 +56,21 @@ body {
 .col-12 {
     width: 100%;
 }
+.col-offset-2 {
+    margin-left: 16.66%;
+}
 .kittenList {
     list-style: none;
 }
-.kittenListItem {
+.kittenListItem, .formRows {
     padding: 10px;
+}
+.hidden {
+    display: none;
+}
+.show {
+    display: initial;
+}
+.catInput {
+    width: 100%;
 }

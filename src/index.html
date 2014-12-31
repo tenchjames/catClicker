@@ -5,11 +5,10 @@
     <link rel="stylesheet" href="css/catclicker.min.css">
 </head>
 <body>
-    <div>
-        <h1>Welcome to cat clicker!</h1>
-    </div>
-
     <div class="grid">
+         <div>
+            <h1>Welcome to cat clicker!</h1>
+        </div>   
         <div class="row">
             <div class="col-3">
                 <div id="catList">
@@ -22,6 +21,47 @@
                     <h2 id="cat-name"></h2>
                     <div id="cat-count"></div>
                     <img id="cat-img" src="" alt="kittys">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button id="adminBtn">Admin</button>
+                <div id="adminArea">
+                    <form id="updateCatForm">
+                        <div class="row formRows">
+                             <div class="col-2">
+                                <label>Cat Name</label>
+                            </div>
+                            <div class="col-4">
+                                <input id="catNameInput" name="catNameInput" value="" class="catInput">
+                            </div>                           
+                        </div>
+
+                        <div class="row formRows">
+                            <div class="col-2">
+                                <label>Cat URL</label>
+                            </div>
+                            <div class="col-4">
+                                <input id="catURLInput" name="catURLInput" value="" class="catInput">
+                            </div>
+                        </div>
+
+                        <div class="row formRows">
+                            <div class="col-2">
+                                <label>Clicks</label>
+                            </div>
+                            <div class="col-4">
+                                <input id="catClicksInput" nam="catClicksInput" value="" class="catInput">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row formRows">
+                        <div class="col-4 col-offset-2">
+                            <button id="cancelBtn">Cancel</button>
+                            <button id="submitBtn">Submit</button>                           
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
